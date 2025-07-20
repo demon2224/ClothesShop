@@ -36,7 +36,7 @@
                     </div>
                 </div>
 
-                <!-- Biểu đồ tròn (Top Products) -->
+                <!-- Biểu đồ tròn (Orders) -->
                 <div class="col-md-12">
                     <div class="tile">
                         <h3 class="tile-title">
