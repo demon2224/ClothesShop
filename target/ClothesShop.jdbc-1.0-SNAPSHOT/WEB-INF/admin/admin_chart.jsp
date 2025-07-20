@@ -39,7 +39,8 @@
                 <!-- Biểu đồ tròn (Top Products) -->
                 <div class="col-md-12">
                     <div class="tile">
-                        <h3 class="tile-title">Top 5 sản phẩm bán chạy</h3>
+                        <h3 class="tile-title">
+                            Số lượng đơn hàng</h3>
                         <div class="tile-body" style="display: flex; justify-content: center;">
                             <canvas id="productPieChart" style="max-width: 1200px; max-height: 600px;"></canvas>
                         </div>

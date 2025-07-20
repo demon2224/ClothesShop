@@ -32,7 +32,6 @@ public class CheckoutServlet extends HttpServlet {
 
     private static final String CHECKOUT_PAGE = "WEB-INF/home/checkout.jsp";
 
-
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -69,7 +68,7 @@ public class CheckoutServlet extends HttpServlet {
             Logger.getLogger(CheckoutServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void handleCheckout(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -96,12 +95,10 @@ public class CheckoutServlet extends HttpServlet {
 
         try {
             // Check if user is logged in, not an admin, and payment method is selected
-            if (user == null) {
-                message = "Please log in to checkout.";
-            } else if (user.getRoleID() == 1) {
-                message = "Admins cannot checkout.";
+            if (user.getRoleID() == 1) {
+                message = "Người quản trị không thể thanh toán.";
             } else if (paymentId == null) {
-                message = "Please select a payment method.";
+                message = "Vui lòng chọn phương thức thanh toán.";
             } else {
                 // Calculate total price and items
                 totalPrice = calculateTotal(cartItems, productDAO);
@@ -176,13 +173,14 @@ public class CheckoutServlet extends HttpServlet {
         return now.format(formatter);
     }
 
-    // Save order details and update product stock
+    // Save order details and update product stock and unitSold
     private void updateOrderDetailsAndStock(List<CartItem> cartItems, OrderDTO order,
             OrderItemDAO orderItemDAO, ProductDAO productDAO) throws SQLException {
         if (cartItems != null) {
             for (CartItem item : cartItems) {
                 orderItemDAO.createNewOrderDetail(item, order);
-                productDAO.updateQuanityProduct(item);
+                productDAO.updateQuanityProduct(item); // Update stock (decrease)
+                productDAO.updateUnitSold(item); // Update unitSold (increase)
             }
         }
     }
@@ -194,7 +192,6 @@ public class CheckoutServlet extends HttpServlet {
         Cookie cartCookie = cartService.getCookieByName(request, "Cart");
         cartService.saveCartToCookie(request, response, "[]");
     }
-
 
     @Override
     public String getServletInfo() {

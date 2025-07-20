@@ -35,10 +35,11 @@ public class ProductDAO extends DBContext {
     private static final String GET_PRODUCTS_BY_CATEGORY_ID = "SELECT * FROM Products WHERE categoryid = ? AND status = 1";
     private static final String GET_PRODUCTS_BY_SUPPLIER_ID = "SELECT * FROM Products WHERE supplierid = ? AND status = 1";
     private static final String GET_PRODUCTS_NEW_YEAR = "SELECT * from Products WHERE year(releasedate) = 2025 AND status = 1";
-    private static final String GET_PRODUCTS_BEST_SELLER = "SELECT TOP(5) * from Products WHERE status = 1 order by unitSold desc";
+    private static final String GET_PRODUCTS_BEST_SELLER = "SELECT TOP(8) * from Products WHERE status = 1 order by unitSold desc";
     private static final String GET_PRODUCTS_BY_SEARCH = "SELECT * FROM Products WHERE productname LIKE ? AND status = 1";
     private static final String DELETE_PRODUCT = "UPDATE Products SET status = 0 WHERE id = ?";
     private static final String UPDATE_QUANTITY_PRODUCT = "UPDATE Products SET [stock] = ? WHERE id = ?";
+    private static final String UPDATE_UNIT_SOLD = "UPDATE Products SET unitSold = unitSold + ? WHERE id = ?";
     private static final String INSERT_PRODUCT = "INSERT INTO Products VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     private static final String RESTORE_PRODUCT = "UPDATE Products SET status = 1 WHERE id = ?";
@@ -691,6 +692,30 @@ public class ProductDAO extends DBContext {
             if (rs != null) {
                 rs.close();
             }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+    // Method to update unitSold when product is sold
+    public void updateUnitSold(CartItem item) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        try {
+            conn = getConnection();
+            if (conn != null) {
+                ptm = conn.prepareStatement(UPDATE_UNIT_SOLD);
+                ptm.setInt(1, item.getQuantity()); // Add sold quantity to existing unitSold
+                ptm.setInt(2, item.getProduct().getId());
+                ptm.executeUpdate();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             if (ptm != null) {
                 ptm.close();
             }
