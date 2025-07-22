@@ -93,6 +93,10 @@
                                             <label>Passwords</label>
                                             <input name="password" type="password" required>
                                         </p>
+                                        <p style="position: relative">
+                                            <label>Confirm Password</label>
+                                            <input name="confirmPassword" type="password" required>
+                                        </p>
                                         <p>
                                             <label>Email</label>
                                             <input name="email" type="email" required>

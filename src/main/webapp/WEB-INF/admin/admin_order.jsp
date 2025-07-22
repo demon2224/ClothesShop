@@ -126,7 +126,7 @@
                                                     <td>(+84) ${b.user.phone}</td>
                                                     <td>${b.user.address}</td>
                                                     <td>${b.orderDate}</td>
-                                                    <td>${b.totalPrice}</td>
+                                                    <td>${b.getFormattedTotalPrice()}đ</td>
                                                     <td><span class="badge bg-success">${b.paymentMethod.paymentMethod}</span></td>
                                                     <td>
                                                         ${b.status ? "Đã giao" : "Chưa giao"}
@@ -138,9 +138,14 @@
                                                         </c:if>
                                                     </td>
                                                     <td>
-                                                        <a style="color: rgb(245 157 57); background-color: rgb(251 226 197); padding: 5px; border-radius: 5px;"
+                                                        <a style="color: rgb(245 157 57); background-color: rgb(251 226 197); padding: 5px; border-radius: 5px; margin-right: 5px;"
                                                            href="manageorder?action=ShowDetail&bill_id=${b.orderID}">
-                                                            <i class="fa"></i> Chi tiết đơn hàng
+                                                            <i class="fa fa-eye"></i> Chi tiết
+                                                        </a>
+                                                        <a style="color: rgb(220 53 69); background-color: rgb(248 215 218); padding: 5px; border-radius: 5px;"
+                                                           href="manageorder?action=DeleteOrder&id=${b.orderID}&page=${currentPage}${requestScope.searchUsername != null ? '&searchUsername=' += requestScope.searchUsername : ''}${requestScope.statusFilter != null ? '&statusFilter=' += requestScope.statusFilter : ''}"
+                                                           onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng #${b.orderID}? Hành động này không thể hoàn tác.')">
+                                                            <i class="fa fa-trash"></i> Xóa
                                                         </a>
                                                     </td>
                                                 </tr>

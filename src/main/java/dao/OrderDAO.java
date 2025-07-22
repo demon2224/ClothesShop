@@ -633,4 +633,97 @@ public class OrderDAO extends DBContext {
         }
         return orderId;
     }
+
+    // Phương thức xóa đơn hàng
+    public void deleteOrder(String orderId) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        PreparedStatement orderItemPtm = null;
+        PreparedStatement checkPtm = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            if (conn != null) {
+                // Kiểm tra trạng thái đơn hàng trước khi xóa
+                String checkStatusQuery = "SELECT status FROM Orders WHERE order_id = ?";
+                checkPtm = conn.prepareStatement(checkStatusQuery);
+                checkPtm.setString(1, orderId);
+                rs = checkPtm.executeQuery();
+                
+                if (rs.next()) {
+                    int status = rs.getInt("status");
+                    if (status == 0) {
+                        throw new SQLException("Đơn hàng này chưa được giao nên không thể xóa!");
+                    }
+                } else {
+                    throw new SQLException("Không tìm thấy đơn hàng với ID: " + orderId);
+                }
+                
+                rs.close();
+                checkPtm.close();
+                
+                // Bắt đầu transaction
+                conn.setAutoCommit(false);
+                
+                // Xóa OrderItem trước (do có khóa ngoại)
+                String deleteOrderItemsQuery = "DELETE FROM OrderItem WHERE order_id = ?";
+                orderItemPtm = conn.prepareStatement(deleteOrderItemsQuery);
+                orderItemPtm.setString(1, orderId);
+                int orderItemsDeleted = orderItemPtm.executeUpdate();
+                
+                // Xóa Order
+                String deleteOrderQuery = "DELETE FROM Orders WHERE order_id = ?";
+                ptm = conn.prepareStatement(deleteOrderQuery);
+                ptm.setString(1, orderId);
+                int ordersDeleted = ptm.executeUpdate();
+                
+                if (ordersDeleted == 0) {
+                    throw new SQLException("Không tìm thấy đơn hàng với ID: " + orderId);
+                }
+                
+                // Commit transaction
+                conn.commit();
+                System.out.println("Đã xóa đơn hàng ID: " + orderId + " cùng với " + orderItemsDeleted + " chi tiết đơn hàng");
+                
+            } else {
+                throw new SQLException("Không thể kết nối cơ sở dữ liệu");
+            }
+        } catch (SQLException e) {
+            // Rollback nếu có lỗi
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            throw e;
+        } catch (Exception e) {
+            // Rollback nếu có lỗi
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            throw new SQLException("Lỗi khi xóa đơn hàng: " + e.getMessage());
+        } finally {
+            // Khôi phục autoCommit
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            
+            if (rs != null) rs.close();
+            if (checkPtm != null) checkPtm.close();
+            if (orderItemPtm != null) orderItemPtm.close();
+            if (ptm != null) ptm.close();
+            if (conn != null) conn.close();
+        }
+    }
 }

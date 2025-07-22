@@ -47,7 +47,7 @@
                                 </div>
                                 <div class="form-group col-md-3">
                                     <label class="control-label">Size</label>
-                                    <input class="form-control" name="size" type="text" placeholder="40,41,42,..." value="${size}">
+                                    <input class="form-control" name="size" type="text" placeholder="" value="${size}">
                                 </div>
                                 <div class="form-group col-md-3">
                                     <label class="control-label">Màu</label>
@@ -91,7 +91,7 @@
                                 </div>
                                 <div class="form-group col-md-12">
                                     <button class="btn btn-save" type="submit">Lưu lại</button>
-                                    <a class="btn btn-cancel" href="${pageContext.request.contextPath}/productmanagement">Hủy bỏ</a>
+                                    <a class="btn btn-cancel" href="productmanagement">Hủy bỏ</a>
                                 </div>
                             </form>
                         </div>

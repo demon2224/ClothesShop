@@ -95,7 +95,7 @@
                                 </div>
                                 <div class="form-group col-md-12">
                                     <button class="btn btn-save" type="submit">Lưu lại</button>
-                                    <a class="btn btn-cancel" href="${pageContext.request.contextPath}/productmanagement">Hủy bỏ</a>
+                                    <a class="btn btn-cancel" href="productmanagement">Hủy bỏ</a>
                                 </div>
                             </form>
                         </div>

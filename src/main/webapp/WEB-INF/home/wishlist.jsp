@@ -70,7 +70,7 @@
                                                             <tr>
                                                                 <td class="product_thumb"><a href="singleproduct?product_id=${p.id}"><img src="${p.images[0]}" alt=""></a></td>
                                                                 <td class="product_name"><a href="singleproductS?product_id=${p.id}">${p.name}</a></td>
-                                                                <td class="product-price">${p.salePrice}đ</td>
+                                                                <td class="product-price">${p.getFormattedSalePrice()}&#273;</td>
                                                                 <c:if test="${p.status == true}">
                                                                     <td class="product_quantity">In Stock</td>
                                                                     <td class="product_total">

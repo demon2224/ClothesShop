@@ -9,7 +9,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" href="assets\home\img\faviconn.png">
+        <link rel="shortcut icon" type="image/x-icon" href="assets/home/img/faviconn.png">
 
         <!-- all css here -->
         <%@include file="/WEB-INF/include/add_css.jsp"%>
@@ -73,7 +73,7 @@
                                                             <td class="product_name">
                                                                 <a href="singleproduct?product_id=${c.product.id}">${c.product.name}</a>
                                                             </td>                                                            
-                                                            <td class="product-price">${c.product.getSalePrice()}đ</td>
+                                                            <td class="product-price">${c.product.getFormattedSalePrice()}đ</td>
                                                             <td class="product_quantity">
                                                                 <!-- Di chuyển input vào trong form -->
                                                                 <form action="cart" method="post">
@@ -86,7 +86,9 @@
                                                                     </button>
                                                                 </form>
                                                             </td>
-                                                            <td class="product_total">${c.product.getSalePrice() * c.quantity}đ</td>
+                                                            <td class="product_total">
+                                                                <fmt:formatNumber value="${c.product.getSalePrice() * c.quantity}" type="number" groupingUsed="true" />&#273;
+                                                            </td>
                                                             <td class="product_remove">
                                                                 <!-- Form for deleting product from cart -->
                                                                 <form action="cart" method="post">
@@ -122,7 +124,7 @@
                                                         <c:set var="productTotal" value="${c.product.getSalePrice() * c.quantity}" />
                                                         <c:set var="totalPrice" value="${totalPrice + productTotal}" />
                                                     </c:forEach>
-                                                    ${totalPrice}đ      
+                                                    <fmt:formatNumber value="${totalPrice}" type="number" groupingUsed="true" />&#273;
                                                 </p>
                                             </div>
                                             <div class="cart_subtotal ">
@@ -137,7 +139,7 @@
                                                         <c:set var="productTotal" value="${c.product.getSalePrice() * c.quantity}" />
                                                         <c:set var="totalPrice" value="${totalPrice + productTotal}" />
                                                     </c:forEach>
-                                                    ${totalPrice}đ
+                                                    <fmt:formatNumber value="${totalPrice}" type="number" groupingUsed="true" />&#273;
                                                 </p>
                                             </div>
                                             <div class="checkout_btn">

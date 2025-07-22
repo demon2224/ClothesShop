@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Tomcat Server",
+			"type": "shell",
+			"command": "java",
+			"args": [
+				"-cp",
+				"target/classes;library/*",
+				"-Djava.awt.headless=true",
+				"org.apache.catalina.startup.Bootstrap"
+			],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

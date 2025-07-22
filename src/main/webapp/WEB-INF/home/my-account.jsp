@@ -9,7 +9,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" href="assets\home\img\faviconn.png">
+        <link rel="shortcut icon" type="image/x-icon" href="assets/home/img/faviconn.png">
 
         <!-- all css here -->
         <%@include file="/WEB-INF/include/add_css.jsp"%>
@@ -80,8 +80,8 @@
                                                                     <tr>
                                                                         <td>${item.product.name}</td>
                                                                         <td>${item.quantity}</td>
-                                                                        <td>${item.price}</td>
-                                                                        <td>${item.quantity * item.price}</td>
+                                                                        <td><fmt:formatNumber value="${item.price}" type="number" groupingUsed="true" />&#273;</td>
+                                                                        <td><fmt:formatNumber value="${item.quantity * item.price}" type="number" groupingUsed="true" />&#273;</td>
                                                                     </tr>
                                                                 </c:forEach>
                                                             </tbody>
@@ -113,7 +113,7 @@
                                                                             <td>${o.orderID}</td>
                                                                             <td>${o.orderDate}</td>
                                                                             <td><span class="success">${o.status == true ? "Đã giao" : "Chưa giao"}</span></td>
-                                                                            <td>${o.totalPrice}</td>
+                                                                            <td><fmt:formatNumber value="${o.totalPrice}" type="number" groupingUsed="true" />&#273;</td>
                                                                             <td><a href="profile?orderID=${o.orderID}" class="view">view</a></td>
                                                                         </tr>
                                                                     </c:forEach>

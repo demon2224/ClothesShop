@@ -68,15 +68,15 @@ public class EditProfileServlet extends HttpServlet {
 
             // Validate email format
             if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-                request.setAttribute("ERROR", "Invalid email format!");
+                request.setAttribute("ERROR", "Định dạng email không hợp lệ!");
                 request.setAttribute("EDIT_MODE", true);
                 request.getRequestDispatcher(PROFILE_PAGE).forward(request, response);
                 return;
             }
 
             // Validate phone number (if provided)
-            if (phone != null && !phone.trim().isEmpty() && !phone.matches("\\d{10,12}")) {
-                request.setAttribute("ERROR", "Invalid phone number format!");
+            if (phone != null && !phone.trim().isEmpty() && !phone.matches("\\d{10}")) {
+                request.setAttribute("ERROR", "Định dạng số điện thoại không hợp lệ!");
                 request.setAttribute("EDIT_MODE", true);
                 request.getRequestDispatcher(PROFILE_PAGE).forward(request, response);
                 return;
@@ -85,14 +85,14 @@ public class EditProfileServlet extends HttpServlet {
             // Update user in database
             UserDAO userDAO = new UserDAO();
             boolean success = userDAO.updateUser(
-                firstName, 
-                lastName, 
-                email, 
-                address, 
-                phone, 
-                currentUser.getUserName(),
-                avatar != null ? avatar : currentUser.getAvatar(),
-                currentUser.getRoleID()
+                    firstName,
+                    lastName,
+                    email,
+                    address,
+                    phone,
+                    currentUser.getUserName(),
+                    avatar != null ? avatar : currentUser.getAvatar(),
+                    currentUser.getRoleID()
             );
 
             if (success) {
@@ -106,13 +106,13 @@ public class EditProfileServlet extends HttpServlet {
                     currentUser.setAvatar(avatar);
                 }
                 session.setAttribute("account", currentUser);
-                
+
                 request.setAttribute("STATUS", "Profile updated successfully!");
             } else {
                 request.setAttribute("ERROR", "Failed to update profile! Please try again.");
                 request.setAttribute("EDIT_MODE", true);
             }
-            
+
             request.getRequestDispatcher(PROFILE_PAGE).forward(request, response);
 
         } catch (SQLException ex) {

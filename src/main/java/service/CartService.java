@@ -21,6 +21,15 @@ public class CartService implements ICartService {
 
     @Override
     public HashMap<Integer, CartItem> createCart(CartItem item) {
+        // Kiểm tra số lượng tồn kho trước khi tạo giỏ hàng
+        if (item.getProduct().getStock() <= 0) {
+            throw new RuntimeException("Sản phẩm '" + item.getProduct().getName() + "' đã hết hàng!");
+        }
+        
+        if (item.getQuantity() > item.getProduct().getStock()) {
+            throw new RuntimeException("Không đủ hàng trong kho! Chỉ còn " + item.getProduct().getStock() + " sản phẩm.");
+        }
+        
         listItemsInCart = new HashMap<>();
         listItemsInCart.put(item.getProduct().getId(), item);
         return listItemsInCart;
@@ -28,11 +37,27 @@ public class CartService implements ICartService {
 
     @Override
     public HashMap<Integer, CartItem> addItemToCart(CartItem item) {
+        // Kiểm tra số lượng tồn kho trước khi thêm vào giỏ
+        if (item.getProduct().getStock() <= 0) {
+            throw new RuntimeException("Sản phẩm '" + item.getProduct().getName() + "' đã hết hàng!");
+        }
+        
         if (checkItemExist(item.getProduct())) {
             CartItem itemExist = listItemsInCart.get(item.getProduct().getId());
-            itemExist.setQuantity(itemExist.getQuantity() + item.getQuantity());
+            int newQuantity = itemExist.getQuantity() + item.getQuantity();
+            
+            // Kiểm tra số lượng sau khi cộng dồn
+            if (newQuantity > item.getProduct().getStock()) {
+                throw new RuntimeException("Không đủ hàng trong kho! Chỉ còn " + item.getProduct().getStock() + " sản phẩm.");
+            }
+            
+            itemExist.setQuantity(newQuantity);
             listItemsInCart.put(itemExist.getProduct().getId(), itemExist);
         } else {
+            // Kiểm tra số lượng yêu cầu với tồn kho
+            if (item.getQuantity() > item.getProduct().getStock()) {
+                throw new RuntimeException("Không đủ hàng trong kho! Chỉ còn " + item.getProduct().getStock() + " sản phẩm.");
+            }
             listItemsInCart.put(item.getProduct().getId(), item);
         }
         return listItemsInCart;
@@ -40,6 +65,15 @@ public class CartService implements ICartService {
 
     @Override
     public HashMap<Integer, CartItem> updateItemToCart(CartItem item) {
+        // Kiểm tra số lượng tồn kho trước khi cập nhật
+        if (item.getProduct().getStock() <= 0) {
+            throw new RuntimeException("Sản phẩm '" + item.getProduct().getName() + "' đã hết hàng!");
+        }
+        
+        if (item.getQuantity() > item.getProduct().getStock()) {
+            throw new RuntimeException("Không đủ hàng trong kho! Chỉ còn " + item.getProduct().getStock() + " sản phẩm.");
+        }
+        
         if (checkItemExist(item.getProduct())) {
             CartItem itemExist = listItemsInCart.get(item.getProduct().getId());
             itemExist.setQuantity(item.getQuantity());

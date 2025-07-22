@@ -32,7 +32,6 @@ public class ProductDAO extends DBContext {
     private static final String GET_PRODUCTS_LOW_QUANTITY = "SELECT COUNT(*) AS Total from Products WHERE Stock < 10 AND status = 1";
     private static final String GET_PRODUCTS_BY_ID = "SELECT * FROM Products WHERE id = ? AND status = 1";
     private static final String GET_PRODUCTS_BY_TYPE_ID = "SELECT * FROM Products WHERE typeid = ? AND status = 1";
-    private static final String GET_PRODUCTS_BY_CATEGORY_ID = "SELECT * FROM Products WHERE categoryid = ? AND status = 1";
     private static final String GET_PRODUCTS_BY_SUPPLIER_ID = "SELECT * FROM Products WHERE supplierid = ? AND status = 1";
     private static final String GET_PRODUCTS_NEW_YEAR = "SELECT * from Products WHERE year(releasedate) = 2025 AND status = 1";
     private static final String GET_PRODUCTS_BEST_SELLER = "SELECT TOP(8) * from Products WHERE status = 1 order by unitSold desc";
@@ -573,15 +572,6 @@ public class ProductDAO extends DBContext {
                     public int compare(ProductDTO p1, ProductDTO p2) {
                         // Sort by sale price, highest first (descending)
                         return Double.compare(p2.getSalePrice(), p1.getSalePrice());
-                    }
-                });
-                break;
-            case "3": // Tên: A-Z
-                Collections.sort(result, new Comparator<ProductDTO>() {
-                    @Override
-                    public int compare(ProductDTO p1, ProductDTO p2) {
-                        // Sort by name, A-Z (case-insensitive)
-                        return p1.getName().compareToIgnoreCase(p2.getName());
                     }
                 });
                 break;

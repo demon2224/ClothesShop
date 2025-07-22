@@ -21,6 +21,7 @@ public class ManageOrderServlet extends HttpServlet {
     private static final String ORDER_PAGE = "WEB-INF/admin/admin_order.jsp";
     private static final String ORDER_DETAIL_PAGE = "WEB-INF/admin/admin_order_detail.jsp";
     private static final String CHANGE_STATUS_ACTION = "ChangeStatus";
+    private static final String DELETE_ORDER_ACTION = "DeleteOrder";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -37,6 +38,8 @@ public class ManageOrderServlet extends HttpServlet {
                 url = showOrderDetail(request, orderDao, orderItemDao);
             } else if (CHANGE_STATUS_ACTION.equals(action)) {
                 url = changeOrderStatus(request, orderDao);
+            } else if (DELETE_ORDER_ACTION.equals(action)) {
+                url = deleteOrder(request, orderDao);
             } else if ("Search".equals(action)) {  // Add search action
                 url = searchOrders(request, orderDao);
             } else {
@@ -79,6 +82,36 @@ public class ManageOrderServlet extends HttpServlet {
         request.setAttribute("mess", "Cập nhật trạng thái thành công!");
         List<OrderDTO> orders = orderDao.getAllOrders();
         request.setAttribute("LIST_ORDERS", orders);
+        request.setAttribute("CURRENTSERVLET", "Order");
+        return ORDER_PAGE;
+    }
+
+    // Xóa đơn hàng
+    private String deleteOrder(HttpServletRequest request, OrderDAO orderDao)
+            throws ServletException, IOException, SQLException {
+        String orderId = request.getParameter("id");
+        try {
+            orderDao.deleteOrder(orderId);
+            request.setAttribute("mess", "Xóa đơn hàng thành công!");
+        } catch (SQLException e) {
+            request.setAttribute("error", "Lỗi khi xóa đơn hàng: " + e.getMessage());
+        }
+        
+        // Redirect về trang hiện tại với các parameter search
+        String searchUsername = request.getParameter("searchUsername");
+        String statusFilter = request.getParameter("statusFilter");
+        String currentPage = request.getParameter("page");
+        
+        if (searchUsername != null || statusFilter != null) {
+            List<OrderDTO> orders = orderDao.searchOrders(searchUsername, statusFilter);
+            request.setAttribute("searchUsername", searchUsername);
+            request.setAttribute("statusFilter", statusFilter);
+            request.setAttribute("LIST_ORDERS", orders);
+        } else {
+            List<OrderDTO> orders = orderDao.getAllOrders();
+            request.setAttribute("LIST_ORDERS", orders);
+        }
+        
         request.setAttribute("CURRENTSERVLET", "Order");
         return ORDER_PAGE;
     }

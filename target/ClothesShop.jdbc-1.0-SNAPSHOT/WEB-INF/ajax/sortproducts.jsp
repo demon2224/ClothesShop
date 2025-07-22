@@ -29,13 +29,18 @@
                         </div>
                     </div>
                     <c:set var="cat" value="${requestScope.LISTCATEGORIES}"/>
-                    <div class="pos_home_section">
+                    <!--pos home section-->
+                    <div class=" pos_home_section">
                         <div class="row pos_home">
-                            <form id="form-filter" action="filter" method="get" class="col-lg-3 col-md-12">
+                            <form id="form-filter" action="${requestScope.DATA_FROM == 'search' ? 'search' : 'filter'}" method="get" class="col-lg-3 col-md-12">
+                                <!--layere categorie"-->
                                 <input type="hidden" name="valueSort" value="${requestScope.VALUESORT}"/>
+                                <c:if test="${requestScope.DATA_FROM == 'search'}">
+                                    <input type="hidden" name="txtSearch" value="${requestScope.txtSearch}">
+                                </c:if>
                                 <div class="sidebar_widget shop_c">
                                     <div class="categorie__titile">
-                                        <h4>Phân loại</h4>
+                                        <h4>Categories</h4>
                                     </div>
                                     <div class="layere_categorie">
                                         <ul>
@@ -52,29 +57,68 @@
                                         </ul>
                                     </div>
                                 </div>
+                                <!--layere categorie end-->
+
+                                <!--color area start-->
+                                <!--color area start-->
                                 <div class="sidebar_widget color">
                                     <h2>Color</h2>
                                     <div class="widget_color">
+                                        <style>
+                                            /* Chỉ target riêng checkbox trong widget_color */
+                                            .widget_color input[type="checkbox"] {
+                                                width: 16px;
+                                                height: 16px;
+                                                margin-right: 8px;
+                                                position: relative;
+                                                top: 1px;
+                                            }
+                                        </style>
                                         <ul>
-                                            <li><input type="checkbox" name="color" value="Đen" ${requestScope.COLOR == 'Black' ? 'checked' : ''}><label>Đen</label></li>
-                                            <li><input type="checkbox" name="color" value="Xanh lá" ${requestScope.COLOR == 'Green' ? 'checked' : ''}><label>Xanh lá</label></li>
-                                            <li><input type="checkbox" name="color" value="Cam" ${requestScope.COLOR == 'Orange' ? 'checked' : ''}><label>Cam</label></li>
-                                            <li><input type="checkbox" name="color" value="Xanh dương" ${requestScope.COLOR == 'Blue' ? 'checked' : ''}><label>Xanh dương</label></li>
-                                            <li><input type="checkbox" name="color" value="Vàng" ${requestScope.COLOR == 'Yellow' ? 'checked' : ''}><label>Vàng</label></li>
-                                            <li><input type="checkbox" name="color" value="Nâu" ${requestScope.COLOR == 'Brown' ? 'checked' : ''}><label>Nâu</label></li>
-                                            <li><input type="checkbox" name="color" value="Trắng" ${requestScope.COLOR == 'White' ? 'checked' : ''}><label>Trắng</label></li>
-                                            <li><input type="checkbox" name="color" value="Đỏ" ${requestScope.COLOR == 'Red' ? 'checked' : ''}><label>Đỏ</label></li>
-                                        </ul>
+                                            <li><input type="checkbox" name="color" value="Đen" <c:forEach var="c" items="${requestScope.COLORS}"><c:if test="${c == 'Đen'}">checked</c:if></c:forEach>><label>Đen</label></li>
+                                            <li><input type="checkbox" name="color" value="Xanh lá" <c:forEach var="c" items="${requestScope.COLORS}"><c:if test="${c == 'Xanh lá'}">checked</c:if></c:forEach>><label>Xanh lá</label></li>
+                                            <li><input type="checkbox" name="color" value="Cam" <c:forEach var="c" items="${requestScope.COLORS}"><c:if test="${c == 'Cam'}">checked</c:if></c:forEach>><label>Cam</label></li>
+                                            <li><input type="checkbox" name="color" value="Xanh dương" <c:forEach var="c" items="${requestScope.COLORS}"><c:if test="${c == 'Xanh dương'}">checked</c:if></c:forEach>><label>Xanh dương</label></li>
+                                            <li><input type="checkbox" name="color" value="Vàng" <c:forEach var="c" items="${requestScope.COLORS}"><c:if test="${c == 'Vàng'}">checked</c:if></c:forEach>><label>Vàng</label></li>
+                                            <li><input type="checkbox" name="color" value="Nâu" <c:forEach var="c" items="${requestScope.COLORS}"><c:if test="${c == 'Nâu'}">checked</c:if></c:forEach>><label>Nâu</label></li>
+                                            <li><input type="checkbox" name="color" value="Trắng" <c:forEach var="c" items="${requestScope.COLORS}"><c:if test="${c == 'Trắng'}">checked</c:if></c:forEach>><label>Trắng</label></li>
+                                            <li><input type="checkbox" name="color" value="Đỏ" <c:forEach var="c" items="${requestScope.COLORS}"><c:if test="${c == 'Đỏ'}">checked</c:if></c:forEach>><label>Đỏ</label></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <!--color area end-->
+                                        <!--price slider start-->
+                                        <div class="sidebar_widget price">
+                                            <h2>Price</h2>
+                                            <div class="shopee-price-range-filter__inputs"
+                                                 style="margin: 1.25rem 2px 0.625rem;
+                                                 display: flex;
+                                                 justify-content: space-between;
+                                                 align-items: center;
+                                                 padding-right: 30px">
+                                                <input type="number"
+                                                       style="height: 35px;
+                                                       width: 90px;"
+                                                       name="pricefrom"
+                                                       placeholder="đ FROM"
+                                                       value="${price1}"
+                                            step="0.5" min="1">
+                                        <div class="shopee-price-range-filter__range-line"
+                                             style="flex: 1;
+                                             height: 1px;
+                                             background: #bdbdbd;
+                                             margin: 0 10px;">
+                                        </div>
+                                        <input type="number"
+                                               style="height: 35px;
+                                               width: 90px;"
+                                               name="priceto"
+                                               placeholder="đ TO"
+                                               value="${price2}"
+                                               step="0.5" min="1">
                                     </div>
                                 </div>
-                                <div class="sidebar_widget price">
-                                    <h2>Price</h2>
-                                    <div class="shopee-price-range-filter__inputs" style="margin: 1.25rem 2px 0.625rem; display: flex; justify-content: space-between; align-items: center; padding-right: 30px">
-                                        <input type="number" style="height: 35px; width: 90px;" name="pricefrom" placeholder="đ FROM" value="${price1}" step="0.5" min="1">
-                                        <div class="shopee-price-range-filter__range-line" style="flex: 1; height: 1px; background: #bdbdbd; margin: 0 10px;"></div>
-                                        <input type="number" style="height: 35px; width: 90px;" name="priceto" placeholder="đ TO" value="${price2}" step="0.5" min="1">
-                                    </div>
-                                </div>
+                                <!--price slider end-->
                                 <div class="sidebar_widget shop_c">
                                     <div class="categorie__titile">
                                         <h4>Discount</h4>
@@ -87,9 +131,27 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <button type="submit" class="submit-price" style="font-size: 16px; background-color: black; color: white; padding: 5px 40px; border-radius: 20px; margin: 10px 0 20px">Apply</button>
-                                <a href="shop" class="submit-price" style="font-size: 16px; background-color: black; color: white; padding: 5px 40px; border-radius: 20px; margin: 10px 0 20px">Reset</a>
-                                <c:if test="${sessionScope.account != null || sessionScope.WISHLIST != null}">
+
+                                <button type="submit" class="submit-price"
+                                        style="font-size: 16px;
+                                        background-color: black;
+                                        color: white;
+                                        padding: 5px 40px;
+                                        border-radius: 20px;
+                                        margin: 10px 0 20px">Apply</button>
+
+                                <a href="shop" class="submit-price"
+                                   style="font-size: 17px;
+                                   background-color: black;
+                                   color: white;
+                                   padding: 10px 44px;
+                                   border-radius: 20px;
+                                   margin: 10px 0 20px">Reset</a>
+
+                                <!--wishlist start-->
+                                <!-- Chỉ hiển thị wishlist cho User và Admin đã đăng nhập -->
+                                <c:if test="${sessionScope.account != null && sessionScope.WISHLIST != null}">
+                                    <!--wishlist block start-->
                                     <div class="sidebar_widget wishlist mb-35">
                                         <div class="block_title">
                                             <h3><a href="wishlist">Wishlist</a></h3>
@@ -102,7 +164,7 @@
                                                     </div>
                                                     <div class="cart_info">
                                                         <a href="singleproduct?product_id=${p.id}">${p.name}</a>
-                                                        <span class="cart_price">${p.salePrice}đ</span>
+                                                        <span class="cart_price">${p.getFormattedSalePrice()}&#273;</span>
                                                     </div>
                                                 </div>
                                             </c:if>
@@ -129,9 +191,8 @@
                                         <form action="shop" method="get">
                                             <select name="valueSort" onchange="this.form.submit()">
                                                 <option value="0">Nổi bật</option>
-                                                <option value="1">Giá: Thấp đến Cao</option>
-                                                <option value="2">Giá: Cao đến Thấp</option>
-                                                <option value="3">Tên: A-Z</option>
+                                                <option value="1">Thấp đến Cao</option>
+                                                <option value="2">Cao đến Thấp</option>
                                             </select>
                                         </form>
                                     </div>
@@ -154,35 +215,68 @@
                                                                     <span class="discount">Up to ${p.discount * 100}%</span>
                                                                 </c:if>
                                                                 <div class="product_action">
-                                                                    <form action="cart" method="get">
-                                                                        <input type="hidden" name="action" value="Add">
-                                                                        <input type="hidden" name="product_id" value="${p.id}">
-                                                                        <input type="hidden" name="quantity" value="1">
-                                                                        <button type="submit" style="display: block; border: none; width: 100%; background: #018576; color: #fff; padding: 7px 0; font-size: 13px;">
-                                                                            <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
-                                                                        </button>
-                                                                    </form>
+                                                                    <!-- Chỉ cho phép User và Admin thêm vào giỏ hàng -->
+                                                                    <c:if test="${sessionScope.account != null}">
+                                                                        <c:choose>
+                                                                            <c:when test="${p.stock <= 0}">
+                                                                                <!-- Hết hàng -->
+                                                                                <button type="button" disabled style="display: block; border: none; width: 100%; background: #ccc; color: #666; padding: 7px 0; font-size: 13px; cursor: not-allowed;">
+                                                                                    <i class="fa fa-ban"></i> Hết hàng
+                                                                                </button>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <form action="cart" method="post">
+                                                                                    <input type="hidden" name="action" value="Add">
+                                                                                    <input type="hidden" name="product_id" value="${p.id}">
+                                                                                    <input type="hidden" name="quantity" value="1">
+                                                                                    <button type="submit" style="display: block; border: none; width: 100%; background: #018576; color: #fff; padding: 7px 0; font-size: 13px;">
+                                                                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
+                                                                                    </button>
+                                                                                </form>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </c:if>
+                                                                    <!-- Guest sẽ được yêu cầu đăng nhập -->
+                                                                    <c:if test="${sessionScope.account == null}">
+                                                                        <c:choose>
+                                                                            <c:when test="${p.stock <= 0}">
+                                                                                <!-- Hết hàng -->
+                                                                                <button type="button" disabled style="display: block; border: none; width: 100%; background: #ccc; color: #666; padding: 7px 0; font-size: 13px; cursor: not-allowed;">
+                                                                                    <i class="fa fa-ban"></i> Hết hàng
+                                                                                </button>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <a href="home?btnAction=Login" style="display: block; border: none; width: 100%; background: #018576; color: #fff; padding: 7px 0; font-size: 13px; text-decoration: none; text-align: center;">
+                                                                                    <i class="fa fa-shopping-cart"></i> Đăng nhập để mua
+                                                                                </a>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </c:if>
                                                                 </div>
                                                             </div>
                                                             <div class="product_content">
                                                                 <div style="display: flex; justify-content: center">
                                                                     <c:if test="${p.price != p.salePrice}">
-                                                                        <span style="margin-right: 10px; font-weight: 400;" class="old_price">${p.price}đ</span>
+                                                                        <span style="margin-right: 10px; font-weight: 400;" class="old_price">${p.getFormattedPrice()}&#273;</span>
                                                                     </c:if>
-                                                                    <span class="current_price">${p.getSalePrice()}đ</span>
+                                                                    <span class="current_price">${p.getFormattedSalePrice()}&#273;</span>
                                                                 </div>
                                                                 <h3 class="product_title"><a href="singleproduct?product_id=${p.id}">${p.name}</a></h3>
                                                             </div>
                                                             <div class="product_info">
                                                                 <ul>
                                                                     <li>
-                                                                        <form action="wishlist" method="get">
-                                                                            <input type="hidden" name="action" value="Add">
-                                                                            <input type="hidden" name="product_id" value="${p.id}">
-                                                                            <button type="submit" style="color: red; border: none; border-radius: 4px; font-size: 13px; padding: 2px 11px; font-weight: 600;">Yêu thích</button>
-                                                                        </form>
+                                                                        <!-- Chỉ cho phép User và Admin thêm vào wishlist -->
+                                                                        <c:if test="${sessionScope.account != null}">
+                                                                            <form action="wishlist" method="post">
+                                                                                <input type="hidden" name="action" value="Add">
+                                                                                <input type="hidden" name="product_id" value="${p.id}">
+                                                                                <button type="submit" style="color: red; border: none; border-radius: 4px; font-size: 13px; padding: 2px 11px; font-weight: 600;">Yêu thích</button>
+                                                                            </form>
+                                                                        </c:if>
                                                                     </li>
-                                                                    <li><a href="singlepoduct?product_id=${p.id}">Xem sản phẩm</a></li>
+                                                                    <!-- Guest chỉ có thể xem sản phẩm -->
+                                                                    <li><a href="singleproduct?product_id=${p.id}">Xem sản phẩm</a></li>
                                                                 </ul>
                                                             </div>
                                                         </div>

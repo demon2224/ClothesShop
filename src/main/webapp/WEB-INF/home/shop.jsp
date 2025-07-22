@@ -9,7 +9,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" href="assets\home\img\faviconn.png">
+        <link rel="shortcut icon" type="image/x-icon" href="assets/home/img/faviconn.png">
 
         <!-- all css here -->
         <%@include file="/WEB-INF/include/add_css.jsp"%>
@@ -40,6 +40,15 @@
                         </div>
                     </div>
                     <!--breadcrumbs area end-->
+
+                    <!-- Hiển thị thông báo lỗi giỏ hàng -->
+                    <c:if test="${sessionScope.CART_ERROR != null}">
+                        <div class="alert alert-danger" style="margin: 20px; padding: 15px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px;">
+                            <strong>Lỗi:</strong> ${sessionScope.CART_ERROR}
+                        </div>
+                        <c:remove var="CART_ERROR" scope="session"/>
+                    </c:if>
+
                     <c:set var="cat" value="${requestScope.LISTCATEGORIES}"/>
                     <!--pos home section-->
                     <div class=" pos_home_section">
@@ -176,7 +185,7 @@
                                                     </div>
                                                     <div class="cart_info">
                                                         <a href="singleproduct?product_id=${p.id}">${p.name}</a>
-                                                        <span class="cart_price">${p.salePrice}đ</span>
+                                                        <span class="cart_price">${p.getFormattedSalePrice()}đ</span>
                                                     </div>
                                                 </div>
                                             </c:if>
@@ -193,7 +202,7 @@
                             <div class="col-lg-9 col-md-12">
                                 <!--banner slider start-->
                                 <div class="banner_slider mb-35">
-                                    <img src="assets\home\img\banner\banner10.jpg" alt="">
+                                    <img src="assets/home/img/banner/banner10.jpg" alt="">
                                 </div>
                                 <!--banner slider end-->
 
@@ -212,9 +221,8 @@
                                         <form action="${requestScope.DATA_FROM == 'filter' ? 'filter' : requestScope.DATA_FROM == 'search' ? 'search' : 'shop'}" method="get">
                                             <select name="valueSort" onchange="this.form.submit()">
                                                 <option value="0" ${requestScope.VALUESORT == '0' ? 'selected' : ''}>Nổi bật</option>
-                                                <option value="1" ${requestScope.VALUESORT == '1' ? 'selected' : ''}>Giá: Thấp đến Cao</option>
-                                                <option value="2" ${requestScope.VALUESORT == '2' ? 'selected' : ''}>Giá: Cao đến Thấp</option>
-                                                <option value="3" ${requestScope.VALUESORT == '3' ? 'selected' : ''}>Tên: A-Z</option>
+                                                <option value="1" ${requestScope.VALUESORT == '1' ? 'selected' : ''}>Thấp đến Cao</option>
+                                                <option value="2" ${requestScope.VALUESORT == '2' ? 'selected' : ''}>Cao đến Thấp</option>
                                             </select>
                                             <c:if test="${requestScope.DATA_FROM == 'filter'}">
                                                 <c:forEach var="id" items="${paramValues.id_filter}">
@@ -263,29 +271,50 @@
                                                                 <div class="product_action">
                                                                     <!-- Chỉ cho phép User và Admin thêm vào giỏ hàng -->
                                                                     <c:if test="${sessionScope.account != null}">
-                                                                        <form action="cart" method="get">
-                                                                            <input type="hidden" name="action" value="Add">
-                                                                            <input type="hidden" name="product_id" value="${p.id}">
-                                                                            <input type="hidden" name="quantity" value="1">
-                                                                            <button type="submit" style="display: block; border: none; width: 100%; background: #018576; color: #fff; padding: 7px 0; font-size: 13px;">
-                                                                                <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
-                                                                            </button>
-                                                                        </form>
+                                                                        <c:choose>
+                                                                            <c:when test="${p.stock <= 0}">
+                                                                                <!-- Hết hàng -->
+                                                                                <button type="button" disabled style="display: block; border: none; width: 100%; background: #ccc; color: #666; padding: 7px 0; font-size: 13px; cursor: not-allowed;">
+                                                                                    <i class="fa fa-ban"></i> Hết hàng
+                                                                                </button>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <!-- Còn hàng -->
+                                                                                <form action="cart" method="get">
+                                                                                    <input type="hidden" name="action" value="Add">
+                                                                                    <input type="hidden" name="product_id" value="${p.id}">
+                                                                                    <input type="hidden" name="quantity" value="1">
+                                                                                    <button type="submit" style="display: block; border: none; width: 100%; background: #018576; color: #fff; padding: 7px 0; font-size: 13px;">
+                                                                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
+                                                                                    </button>
+                                                                                </form>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
                                                                     </c:if>
                                                                     <!-- Guest sẽ được yêu cầu đăng nhập -->
                                                                     <c:if test="${sessionScope.account == null}">
-                                                                        <a href="home?btnAction=Login" style="display: block; border: none; width: 100%; background: #018576; color: #fff; padding: 7px 0; font-size: 13px; text-decoration: none; text-align: center;">
-                                                                            <i class="fa fa-shopping-cart"></i> Đăng nhập để mua
-                                                                        </a>
+                                                                        <c:choose>
+                                                                            <c:when test="${p.stock <= 0}">
+                                                                                <!-- Hết hàng -->
+                                                                                <button type="button" disabled style="display: block; border: none; width: 100%; background: #ccc; color: #666; padding: 7px 0; font-size: 13px; cursor: not-allowed;">
+                                                                                    <i class="fa fa-ban"></i> Hết hàng
+                                                                                </button>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <a href="home?btnAction=Login" style="display: block; border: none; width: 100%; background: #018576; color: #fff; padding: 7px 0; font-size: 13px; text-decoration: none; text-align: center;">
+                                                                                    <i class="fa fa-shopping-cart"></i> Đăng nhập để mua
+                                                                                </a>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
                                                                     </c:if>
                                                                 </div>
                                                             </div>
                                                             <div class="product_content">
                                                                 <div style="display: flex; justify-content: center">
                                                                     <c:if test="${p.price != p.salePrice}">
-                                                                        <span style="margin-right: 10px; font-weight: 400;" class="old_price">${p.price}đ</span>
+                                                                        <span style="margin-right: 10px; font-weight: 400;" class="old_price">${p.getFormattedPrice()}đ</span>
                                                                     </c:if>
-                                                                    <span class="current_price">${p.getSalePrice()}đ</span>
+                                                                    <span class="current_price">${p.getFormattedSalePrice()}đ</span>
                                                                 </div>
                                                                 <h3 class="product_title"><a href="singleproduct?product_id=${p.id}">${p.name}</a></h3>
                                                             </div>

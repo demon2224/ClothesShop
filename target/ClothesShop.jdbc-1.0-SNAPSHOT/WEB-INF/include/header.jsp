@@ -74,7 +74,7 @@
             <!--logo start-->
             <div class="col-lg-3 col-md-3">
                 <div class="logo">
-                    <a href="home"><img src="assets\home\img\logo\logo.jpg.png" alt=""></a>
+                    <a href="home"><img src="assets/home/img/logo/logo.jpg.png" alt=""></a>
                 </div>
             </div>
             <!--logo end-->
@@ -105,7 +105,7 @@
                                         </div>
                                         <div class="cart_info">
                                             <a href="singleproduct?product_id=${c.product.id}">${c.product.name}</a>
-                                            <span class="cart_price">${c.product.getSalePrice()}&#273;</span>
+                                            <span class="cart_price">${c.product.getFormattedSalePrice()}&#273;</span>
                                             <span class="quantity">Quantity: ${c.quantity}</span>
                                         </div>
                                         <div class="cart_remove">
@@ -118,10 +118,10 @@
                                     <span class="prices">
                                         <c:set var="totalPrice" value="0" />
                                         <c:forEach items="${sessionScope.CART}" var="c">
-                                            <c:set var="productTotal" value="${c.product.getSalePrice() * c.quantity}" />
+                                            <c:set var="productTotal" value="${c.product.salePrice * c.quantity}" />
                                             <c:set var="totalPrice" value="${totalPrice + productTotal}" />
                                         </c:forEach>
-                                        ${totalPrice}&#273;
+                                        <fmt:formatNumber value="${totalPrice}" type="number" groupingUsed="true" />&#273;
                                     </span>
                                 </div>
                                 <div class="cart_button">

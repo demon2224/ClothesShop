@@ -1,6 +1,8 @@
 
 package model;
 
+import utils.PriceFormatter;
+
 /**
  *
  * @author Group - 07
@@ -53,6 +55,11 @@ public class OrderItem {
 
     public void setOrderID(int orderID) {
         this.orderID = orderID;
+    }
+    
+    // Format giá theo kiểu Việt Nam
+    public String getFormattedPrice() {
+        return PriceFormatter.format(price);
     }
     
     

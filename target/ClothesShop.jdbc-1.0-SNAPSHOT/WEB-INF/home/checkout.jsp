@@ -9,7 +9,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" href="assets\home\img\faviconn.png">
+        <link rel="shortcut icon" type="image/x-icon" href="assets/home/img/faviconn.png">
 
         <!-- all css here -->
         <%@include file="/WEB-INF/include/add_css.jsp"%>
@@ -45,13 +45,6 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="user-actions mb-20">
-                                    <c:if test="${sessionScope.account == null}">
-                                        <h3> 
-                                            <i class="fa fa-file-o" aria-hidden="true"></i>
-                                            Để thanh toán đơn hàng, bạn cần đăng nhập >>
-                                            <a class="Returning" href="home?btnAction=Login">Nhấn vào đây để đăng nhập</a>     
-                                        </h3>
-                                    </c:if>
                                     <c:if test="${sessionScope.account != null}">
                                         <h3> 
                                             <i class="fa fa-file-o" aria-hidden="true"></i>
@@ -127,7 +120,10 @@
                                                             <c:forEach items="${sessionScope.CART}" var="c">
                                                                 <tr>
                                                                     <td>${c.product.name}<strong> × ${c.quantity}</strong></td>
-                                                                    <td> ${c.product.getSalePrice() * c.quantity}đ</td>
+                                                                    <td>
+                                                                        <c:set var="itemTotal" value="${c.product.salePrice * c.quantity}" />
+                                                                        <fmt:formatNumber value="${itemTotal}" type="number" groupingUsed="true" />đ
+                                                                    </td>
                                                                 </tr>
                                                             </c:forEach>
                                                         </tbody>
@@ -137,10 +133,10 @@
                                                                 <td>
                                                                     <c:set var="totalPrice" value="0" />
                                                                     <c:forEach items="${sessionScope.CART}" var="c">
-                                                                        <c:set var="productTotal" value="${c.product.getSalePrice() * c.quantity}" />
+                                                                        <c:set var="productTotal" value="${c.product.salePrice * c.quantity}" />
                                                                         <c:set var="totalPrice" value="${totalPrice + productTotal}" />
                                                                     </c:forEach>
-                                                                    ${totalPrice}đ
+                                                                    <fmt:formatNumber value="${totalPrice}" type="number" groupingUsed="true" />đ
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -152,10 +148,10 @@
                                                                 <td><strong>
                                                                         <c:set var="totalPrice" value="0" />
                                                                         <c:forEach items="${sessionScope.CART}" var="c">
-                                                                            <c:set var="productTotal" value="${c.product.getSalePrice() * c.quantity}" />
+                                                                            <c:set var="productTotal" value="${c.product.salePrice * c.quantity}" />
                                                                             <c:set var="totalPrice" value="${totalPrice + productTotal}" />
                                                                         </c:forEach>
-                                                                        ${totalPrice}đ  
+                                                                        <fmt:formatNumber value="${totalPrice}" type="number" groupingUsed="true" />đ  
                                                                     </strong>
                                                                 </td>
                                                             </tr>
@@ -179,7 +175,7 @@
                                                 <c:if test="${sessionScope.CART != null && sessionScope.CART.size() > 0}">
                                                     <c:if test="${sessionScope.account != null && sessionScope.account.roleID == 2}">
                                                         <div class="order_button">
-                                                            <button type="submit">Thanh toán</button> 
+                                                            <button type="submit" onclick="return validateCheckoutInfo()">Thanh toán</button> 
                                                         </div>    
                                                     </c:if>
                                                 </c:if>
@@ -208,6 +204,58 @@
             <!--footer area start-->
             <%@ include file="/WEB-INF/include/footer.jsp" %>
             <!--footer area end-->
+            
+            <script>
+                function validateCheckoutInfo() {
+                    // Lấy thông tin từ session account
+                    var firstName = "${sessionScope.account.firstName}";
+                    var lastName = "${sessionScope.account.lastName}";
+                    var phone = "${sessionScope.account.phone}";
+                    var address = "${sessionScope.account.address}";
+                    var email = "${sessionScope.account.email}";
+                    
+                    // Kiểm tra từng trường thông tin
+                    if (!firstName || firstName.trim() === '' || firstName === 'null') {
+                        alert("Vui lòng cập nhật họ tên trong thông tin tài khoản trước khi thanh toán!");
+                        window.location.href = "profile";
+                        return false;
+                    }
+                    
+                    if (!lastName || lastName.trim() === '' || lastName === 'null') {
+                        alert("Vui lòng cập nhật họ tên trong thông tin tài khoản trước khi thanh toán!");
+                        window.location.href = "profile";
+                        return false;
+                    }
+                    
+                    if (!phone || phone.trim() === '' || phone === 'null') {
+                        alert("Vui lòng cập nhật số điện thoại trong thông tin tài khoản trước khi thanh toán!");
+                        window.location.href = "profile";
+                        return false;
+                    }
+                    
+                    if (!address || address.trim() === '' || address === 'null') {
+                        alert("Vui lòng cập nhật địa chỉ trong thông tin tài khoản trước khi thanh toán!");
+                        window.location.href = "profile";
+                        return false;
+                    }
+                    
+                    if (!email || email.trim() === '' || email === 'null') {
+                        alert("Vui lòng cập nhật email trong thông tin tài khoản trước khi thanh toán!");
+                        window.location.href = "profile";
+                        return false;
+                    }
+                    
+                    // Kiểm tra phương thức thanh toán đã được chọn
+                    var paymentMethod = document.querySelector('input[name="check_method"]:checked');
+                    if (!paymentMethod) {
+                        alert("Vui lòng chọn phương thức thanh toán!");
+                        return false;
+                    }
+                    
+                    // Nếu tất cả thông tin đều đầy đủ, cho phép submit form
+                    return true;
+                }
+            </script>
     </body>
 </html>
 

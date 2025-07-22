@@ -27,18 +27,18 @@
                         <div class="tile-body">
                             <h3 style="color: green; text-align: center; margin: 20px 0">${requestScope.mess}</h3>
                             <h3 style="color: red; text-align: center; margin: 20px 0">${requestScope.error}</h3>
-                            <form class="row" action="usermanagement" method="post">
+                            <form class="row" action="usermanagement" method="post" enctype="multipart/form-data">
                                 <input type="hidden" name="action" value="Update">
                                 <div class="form-group col-md-6">
                                     <label class="control-label">Tên đăng nhập</label>
                                     <input class="form-control" type="text" readonly name="username" value="${username}">
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label class="control-label">First name</label>
+                                    <label class="control-label">Tên</label>
                                     <input class="form-control" type="text" name="firstname" value="${firstname}" required>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label class="control-label">Last name</label>
+                                    <label class="control-label">Họ</label>
                                     <input class="form-control" type="text" name="lastname" value="${lastname}" required>
                                 </div>
                                 <div class="form-group col-md-6">
@@ -69,7 +69,7 @@
                                 </div>
                                 <div class="form-group col-md-12">
                                     <button class="btn btn-save" type="submit">Lưu lại</button>
-                                    <a class="btn btn-cancel" href="${pageContext.request.contextPath}/usermanagement">Hủy bỏ</a>
+                                    <a class="btn btn-cancel" href="usermanagement">Hủy bỏ</a>
                                 </div>
                             </form>
                         </div>

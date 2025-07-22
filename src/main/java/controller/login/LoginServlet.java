@@ -60,7 +60,7 @@ public class LoginServlet extends HttpServlet {
             UserDTO user = userDAO.checkLogin(username, hashedPassword);
 
             if (user == null) {
-                request.setAttribute("msg", "Invalid username or password!");
+                request.setAttribute("msg", "Tên người dùng hoặc mật khẩu không hợp lệ!");
                 request.setAttribute("uName", username);
                 request.getRequestDispatcher(LOGIN).forward(request, response);
             } else {

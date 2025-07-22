@@ -23,7 +23,7 @@
                         <ul class="app-breadcrumb breadcrumb">
                             <li class="breadcrumb-item"><a href="#"><b>Bảng điều khiển</b></a></li>
                         </ul>
-                        <div id="clock">Ngày: <%= new java.text.SimpleDateFormat("EEEE, dd/MM/yyyy").format(new java.util.Date())%></div>
+                        <div id="clock"><%= new java.text.SimpleDateFormat("EEEE, dd/MM/yyyy").format(new java.util.Date())%></div>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                                         <td>(+84) ${b.user.phone}</td>
                                         <td>${b.user.address}</td>
                                         <td>${b.orderDate}</td>
-                                        <td>${b.totalPrice}</td>
+                                        <td>${b.getFormattedTotalPrice()}đ</td>
                                         <td><span class="badge bg-success">${b.paymentMethod.paymentMethod}</span></td>
                                         <td>
                                             ${b.status ? "Đã giao" : "Chưa giao"}
@@ -121,7 +121,7 @@
                                         <td>
                                             <a style="color: rgb(245, 157, 57); background-color: rgb(251, 226, 197); padding: 5px; border-radius: 5px;"
                                                href="manageorder?action=ShowDetail&bill_id=${b.orderID}">
-                                                <i class="fa"></i> Chi tiết
+                                                <i class="fa fa-eye"></i> Chi tiết
                                             </a>
                                         </td>
                                     </tr>

@@ -456,19 +456,62 @@ public class UserDAO extends DBContext {
     public void deleteUser(String uid) throws SQLException {
         Connection conn = null;
         PreparedStatement ptm = null;
+        PreparedStatement checkPtm = null;
         ResultSet rs = null;
+
         try {
             conn = getConnection();
             if (conn != null) {
+                // Lấy username từ uid
+                String getUsernameQuery = "SELECT username FROM Users WHERE id = ?";
+                checkPtm = conn.prepareStatement(getUsernameQuery);
+                checkPtm.setString(1, uid);
+                rs = checkPtm.executeQuery();
+
+                String username = null;
+                if (rs.next()) {
+                    username = rs.getString("username");
+                } else {
+                    throw new SQLException("Không tìm thấy người dùng với ID: " + uid);
+                }
+
+                rs.close();
+                checkPtm.close();
+
+                // Kiểm tra xem user có đơn hàng không
+                String checkOrdersQuery = "SELECT COUNT(*) as orderCount FROM Orders WHERE username = ?";
+                checkPtm = conn.prepareStatement(checkOrdersQuery);
+                checkPtm.setString(1, username);
+                rs = checkPtm.executeQuery();
+
+                int orderCount = 0;
+                if (rs.next()) {
+                    orderCount = rs.getInt("orderCount");
+                }
+
+                rs.close();
+                checkPtm.close();
+
+                // Nếu có đơn hàng, không cho phép xóa
+                if (orderCount > 0) {
+                    throw new SQLException("Không thể xóa người dùng này vì họ có " + orderCount + " đơn hàng. Vui lòng vào mục Quản lý đơn hàng để xóa các đơn hàng đó trước.");
+                }
+
+                // Nếu không có đơn hàng, thực hiện soft delete
                 ptm = conn.prepareStatement(DELETE_USER);
                 ptm.setString(1, uid);
                 ptm.executeUpdate();
             }
+        } catch (SQLException e) {
+            throw e; // Ném lại SQLException để servlet có thể bắt
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new SQLException("Lỗi khi xóa người dùng: " + e.getMessage());
         } finally {
             if (rs != null) {
                 rs.close();
+            }
+            if (checkPtm != null) {
+                checkPtm.close();
             }
             if (ptm != null) {
                 ptm.close();
@@ -551,29 +594,6 @@ public class UserDAO extends DBContext {
         }
     }
 
-    public void permanentlyDeleteUser(String uid) throws SQLException {
-        Connection conn = null;
-        PreparedStatement ptm = null;
-        try {
-            conn = getConnection();
-            if (conn != null) {
-                String query = "DELETE FROM Users WHERE id = ?";
-                ptm = conn.prepareStatement(query);
-                ptm.setString(1, uid);
-                ptm.executeUpdate();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (ptm != null) {
-                ptm.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        }
-    }
-
     public List<Object[]> getTopUsersByTotalSpent(int limit) throws SQLException {
         List<Object[]> topUsers = new ArrayList();
         Connection conn = null;
@@ -613,13 +633,114 @@ public class UserDAO extends DBContext {
 
         return topUsers;
     }
-//    public static void main(String[] args) throws SQLException {
-//        UserDAO dao = new UserDAO();
-//        UserDTO user = dao.checkLogin("phuuthanh2003", "1231231231");
-////        List<UserDTO> list = dao.getData();
-////        for (int i = 0; i < list.size(); i++) {
-////            System.out.println(list.get(i).getAvatar());
-////        }
-//        System.out.println(user.getFirstName());
-//    }
+
+    // Phương thức xóa vĩnh viễn user và tất cả đơn hàng của họ
+    public void permanentlyDeleteUser(String uid) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        PreparedStatement checkPtm = null;
+        PreparedStatement deletePtm = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            if (conn != null) {
+                // Bắt đầu transaction
+                conn.setAutoCommit(false);
+
+                // Lấy username từ uid
+                String getUsernameQuery = "SELECT username FROM Users WHERE id = ?";
+                checkPtm = conn.prepareStatement(getUsernameQuery);
+                checkPtm.setString(1, uid);
+                rs = checkPtm.executeQuery();
+
+                String username = null;
+                if (rs.next()) {
+                    username = rs.getString("username");
+                } else {
+                    throw new SQLException("Không tìm thấy người dùng với ID: " + uid);
+                }
+
+                rs.close();
+                checkPtm.close();
+
+                // Xóa các OrderItem trước (do có khóa ngoại đến Orders)
+                String deleteOrderItemsQuery = "DELETE FROM OrderItem WHERE order_id IN (SELECT order_id FROM Orders WHERE username = ?)";
+                deletePtm = conn.prepareStatement(deleteOrderItemsQuery);
+                deletePtm.setString(1, username);
+                int orderItemsDeleted = deletePtm.executeUpdate();
+                deletePtm.close();
+
+                // Xóa các Orders của user
+                String deleteOrdersQuery = "DELETE FROM Orders WHERE username = ?";
+                deletePtm = conn.prepareStatement(deleteOrdersQuery);
+                deletePtm.setString(1, username);
+                int ordersDeleted = deletePtm.executeUpdate();
+                deletePtm.close();
+
+                // Cuối cùng xóa User
+                String deleteUserQuery = "DELETE FROM Users WHERE id = ?";
+                ptm = conn.prepareStatement(deleteUserQuery);
+                ptm.setString(1, uid);
+                int userDeleted = ptm.executeUpdate();
+
+                if (userDeleted == 0) {
+                    throw new SQLException("Không thể xóa người dùng với ID: " + uid);
+                }
+
+                // Commit transaction
+                conn.commit();
+                System.out.println("Đã xóa vĩnh viễn user " + username + " cùng với " + ordersDeleted + " đơn hàng và " + orderItemsDeleted + " chi tiết đơn hàng");
+
+            } else {
+                throw new SQLException("Không thể kết nối cơ sở dữ liệu");
+            }
+        } catch (SQLException e) {
+            // Rollback nếu có lỗi
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            throw e;
+        } catch (Exception e) {
+            // Rollback nếu có lỗi
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            throw new SQLException("Lỗi khi xóa vĩnh viễn người dùng: " + e.getMessage());
+        } finally {
+            // Khôi phục autoCommit
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            if (rs != null) {
+                rs.close();
+            }
+            if (checkPtm != null) {
+                checkPtm.close();
+            }
+            if (deletePtm != null) {
+                deletePtm.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+    }
+
 }

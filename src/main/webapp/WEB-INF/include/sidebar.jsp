@@ -16,8 +16,20 @@
 <!-- Sidebar menu-->
 <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
 <aside class="app-sidebar">
-    <div class="app-sidebar__user"><img class="app-sidebar__user-avatar" src="${sessionScope.account.avatar}"
-                                        alt="User Image">
+    <div class="app-sidebar__user">
+        <c:choose>
+            <c:when test="${not empty sessionScope.account.avatar}">
+                <img class="app-sidebar__user-avatar" 
+                     src="${pageContext.request.contextPath}/assets/home/img/users/${sessionScope.account.avatar}" 
+                     alt="User Image"
+                     onerror="this.src='${pageContext.request.contextPath}/assets/home/img/users/user.jpg'">
+            </c:when>
+            <c:otherwise>
+                <img class="app-sidebar__user-avatar" 
+                     src="${pageContext.request.contextPath}/assets/home/img/users/user.jpg" 
+                     alt="Default User Image">
+            </c:otherwise>
+        </c:choose>
         <div>
             <p class="app-sidebar__user-name"><b>${sessionScope.account.firstName} ${sessionScope.account.lastName}</b></p>
             <p class="app-sidebar__user-designation">Chào mừng bạn trở lại</p>

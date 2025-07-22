@@ -120,7 +120,7 @@
                                                     <td>${p.category.name}</td>
                                                     <td>${p.name}</td>
                                                     <td>
-                                                        <fmt:formatNumber value="${p.price * (1 - p.discount)}" type="number" maxFractionDigits="2" minFractionDigits="2"/>
+                                                        ${p.getFormattedSalePrice()}đ
                                                     </td>
                                                     <td>
                                                         <c:forEach items="${p.size}" var="s" varStatus="loop">

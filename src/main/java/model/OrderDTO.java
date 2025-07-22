@@ -2,6 +2,7 @@
 package model;
 
 import java.sql.Date;
+import utils.PriceFormatter;
 
 /**
  *
@@ -73,6 +74,11 @@ public class OrderDTO {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+    
+    // Format tổng giá theo kiểu Việt Nam
+    public String getFormattedTotalPrice() {
+        return PriceFormatter.format(totalPrice);
     }
     
     

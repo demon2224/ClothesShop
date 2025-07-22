@@ -31,6 +31,7 @@ model\TypeDTO.class
 utils\DBContext.class
 controller\shop\SingleProductServlet.class
 controller\login\LoginServlet.class
+utils\PriceFormatter.class
 controller\cart_wishlist\CheckoutServlet.class
 controller\AdminServlet.class
 controller\shop\ShopServlet.class

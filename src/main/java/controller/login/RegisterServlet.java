@@ -51,12 +51,20 @@ public class RegisterServlet extends HttpServlet {
             String lName = request.getParameter("lastname");
             String uName = request.getParameter("username");
             String uPass = request.getParameter("password");
+            String confirmPass = request.getParameter("confirmPassword");
             String email = request.getParameter("email");
             String action = request.getParameter("action");
 
             // Validate required fields
-            if (isEmpty(fName) || isEmpty(lName) || isEmpty(uName) || isEmpty(uPass) || isEmpty(email)) {
+            if (isEmpty(fName) || isEmpty(lName) || isEmpty(uName) || isEmpty(uPass) || isEmpty(confirmPass) || isEmpty(email)) {
                 request.setAttribute("ERROR", "Tất cả các trường đều bắt buộc!");
+                request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
+                return;
+            }
+            
+            // Validate password confirmation
+            if (!uPass.equals(confirmPass)) {
+                request.setAttribute("ERROR", "Mật khẩu và xác nhận mật khẩu không khớp!");
                 request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
                 return;
             }
@@ -107,7 +115,7 @@ public class RegisterServlet extends HttpServlet {
                 String hashedPassword = getMd5(uPass);
 
                 // Create new user with hashed password
-                UserDTO user = new UserDTO(0, fName, lName, email, "assets/img/users/user.jpg",
+                UserDTO user = new UserDTO(0, fName, lName, email, "assets/home/img/users/user.jpg",
                         uName, hashedPassword, "", "", 2, true);
                 ud.registerUser(user);
 

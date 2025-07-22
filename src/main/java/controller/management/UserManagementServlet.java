@@ -2,13 +2,22 @@ package controller.management;
 
 import dao.UserDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import model.UserDTO;
 
@@ -16,6 +25,11 @@ import model.UserDTO;
  *
  * @author Group - 07
  */
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024, // 1 MB
+        maxFileSize = 1024 * 1024 * 5, // 5 MB
+        maxRequestSize = 1024 * 1024 * 10 // 10 MB
+)
 public class UserManagementServlet extends HttpServlet {
 
     private static final String MANAGE_USER_PAGE = "WEB-INF/admin/admin_users.jsp";
@@ -23,10 +37,86 @@ public class UserManagementServlet extends HttpServlet {
     private static final String EDIT_USER_PAGE = "WEB-INF/admin/admin_edit_user.jsp";
     private static final String UPLOAD_DIR = "assets/home/img/users/";
 
+    /**
+     * Kiểm tra quyền truy cập admin
+     */
+    private boolean checkAdminAccess(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        HttpSession session = request.getSession();
+        UserDTO user = (UserDTO) session.getAttribute("account");
+
+        if (user == null) {
+            log("Unauthorized admin access attempt - not logged in from " + request.getRequestURI());
+            response.sendRedirect("home?btnAction=Login");
+            return false;
+        }
+
+        if (user.getRoleID() != 1) {
+            log("Unauthorized admin access attempt by user: " + user.getUserName()
+                    + " (ID: " + user.getId() + ") to " + request.getRequestURI());
+            response.sendRedirect("home");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Xử lý upload file ảnh
+     */
+    private String handleFileUpload(HttpServletRequest request, String currentAvatar) throws IOException, ServletException {
+        Part filePart = request.getPart("avatar");
+
+        if (filePart == null || filePart.getSize() == 0) {
+            return currentAvatar; // Không có file mới, giữ ảnh cũ
+        }
+
+        String fileName = filePart.getSubmittedFileName();
+        if (fileName == null || fileName.trim().isEmpty()) {
+            return currentAvatar;
+        }
+
+        // Kiểm tra extension
+        String fileExtension = "";
+        int lastDotIndex = fileName.lastIndexOf(".");
+        if (lastDotIndex > 0) {
+            fileExtension = fileName.substring(lastDotIndex).toLowerCase();
+        }
+
+        // Chỉ cho phép ảnh
+        if (!fileExtension.matches("\\.(jpg|jpeg|png|gif|bmp)$")) {
+            throw new ServletException("Chỉ được upload file ảnh (jpg, jpeg, png, gif, bmp)");
+        }
+
+        // Sử dụng tên file gốc (không mã hóa)
+        String originalFileName = fileName;
+
+        // Đường dẫn upload (relative to webapp)
+        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
+
+        // Tạo thư mục nếu chưa có
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        // Lưu file với tên gốc
+        Path filePath = Paths.get(uploadPath + originalFileName);
+        Files.copy(filePart.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return UPLOAD_DIR + originalFileName;
+    }
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
-        String url = "view/jsp/admin/admin_users.jsp";
+
+        // Kiểm tra quyền truy cập admin
+        if (!checkAdminAccess(request, response)) {
+            return; // Đã redirect, không cần xử lý thêm
+        }
+
+        String url = "WEB-INF/admin/admin_users.jsp";
         String action = request.getParameter("action");
 
         try {
@@ -91,28 +181,42 @@ public class UserManagementServlet extends HttpServlet {
 
     private String deleteUser(HttpServletRequest request, UserDAO userDao) throws SQLException {
         String uid = request.getParameter("uid");
-        userDao.deleteUser(uid);
-        request.setAttribute("mess", "Xóa người dùng thành công!");
+        try {
+            userDao.deleteUser(uid);
+            request.setAttribute("mess", "Xóa người dùng thành công!");
+        } catch (SQLException e) {
+            // Nếu có lỗi từ DAO (ví dụ: có đơn hàng), hiển thị thông báo lỗi
+            request.setAttribute("error", e.getMessage());
+        }
         return this.showUserList(request, userDao);
     }
 
     private String insertNewUser(HttpServletRequest request, UserDAO userDao) throws SQLException, Exception {
-        String fullName = request.getParameter("fullname");
+        String firstName = request.getParameter("firstname");
+        String lastName = request.getParameter("lastname");
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String email = request.getParameter("email");
         String address = request.getParameter("address");
         String phone = request.getParameter("phone");
         String role = request.getParameter("role");
-        String avatar = request.getParameter("avatar");
-        String firstName = fullName != null && !fullName.isEmpty() ? fullName.split(" ")[0] : "";
-        String lastName = fullName != null && fullName.split(" ").length > 1 ? String.join(" ", (CharSequence[]) Arrays.copyOfRange(fullName.split(" "), 1, fullName.split(" ").length)) : "";
+
         int roleId = "admin".equals(role) ? 1 : 2;
-        if (avatar != null && !avatar.isEmpty()) {
-            avatar = UPLOAD_DIR + avatar;
+
+        // Xử lý upload ảnh
+        String avatar = "";
+        try {
+            avatar = handleFileUpload(request, "");
+        } catch (Exception e) {
+            request.setAttribute("error", "Lỗi upload ảnh: " + e.getMessage());
+            this.setUserAttributes(request, username, firstName, lastName, phone, email, address, "", role);
+            return INSERT_USER_PAGE;
         }
 
-        UserDTO user = new UserDTO(0, firstName, lastName, email, avatar, username, password, address, phone, roleId, true);
+        // Mã hóa mật khẩu trước khi lưu vào database
+        String hashedPassword = encryptPassword(password);
+
+        UserDTO user = new UserDTO(0, firstName, lastName, email, avatar, username, hashedPassword, address, phone, roleId, true);
 
         try {
             userDao.registerUser(user);
@@ -133,12 +237,19 @@ public class UserManagementServlet extends HttpServlet {
         String address = request.getParameter("address");
         String email = request.getParameter("email");
         String role = request.getParameter("role");
-        String avatar = request.getParameter("avatar");
-        if (avatar != null && !avatar.isEmpty()) {
-            avatar = UPLOAD_DIR + avatar;
-        } else {
-            UserDTO existingUser = userDao.getUserByName(username);
-            avatar = existingUser != null ? existingUser.getAvatar() : "";
+
+        // Lấy ảnh hiện tại
+        UserDTO existingUser = userDao.getUserByName(username);
+        String currentAvatar = existingUser != null ? existingUser.getAvatar() : "";
+
+        // Xử lý upload ảnh mới (nếu có)
+        String avatar = "";
+        try {
+            avatar = handleFileUpload(request, currentAvatar);
+        } catch (Exception e) {
+            request.setAttribute("error", "Lỗi upload ảnh: " + e.getMessage());
+            this.setUserAttributes(request, username, firstname, lastname, phone, email, address, currentAvatar, role);
+            return EDIT_USER_PAGE;
         }
 
         int roleId = "admin".equals(role) ? 1 : 2;
@@ -175,8 +286,23 @@ public class UserManagementServlet extends HttpServlet {
 
     private String permanentlyDeleteUser(HttpServletRequest request, UserDAO userDao) throws SQLException, Exception {
         String uid = request.getParameter("uid");
-        userDao.permanentlyDeleteUser(uid);
-        request.setAttribute("mess", "Xóa vĩnh viễn người dùng thành công!");
+        log("Attempting to permanently delete user with ID: " + uid);
+
+        if (uid == null || uid.trim().isEmpty()) {
+            log("Error: User ID is null or empty");
+            request.setAttribute("error", "ID người dùng không hợp lệ!");
+            return this.showUserList(request, userDao);
+        }
+
+        try {
+            userDao.permanentlyDeleteUser(uid);
+            log("Successfully permanently deleted user with ID: " + uid);
+            request.setAttribute("mess", "Xóa vĩnh viễn người dùng thành công!");
+        } catch (Exception e) {
+            log("Error permanently deleting user: " + e.getMessage());
+            request.setAttribute("error", "Lỗi khi xóa vĩnh viễn người dùng: " + e.getMessage());
+        }
+
         return this.showUserList(request, userDao);
     }
 
@@ -189,6 +315,22 @@ public class UserManagementServlet extends HttpServlet {
         request.setAttribute("address", address);
         request.setAttribute("avatar", avatar);
         request.setAttribute("role", role);
+    }
+
+    // Method để mã hóa mật khẩu MD5 giống như RegisterServlet
+    private String encryptPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] hash = md.digest(password.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder(2 * hash.length);
+            for (byte b : hash) {
+                sb.append(String.format("%02x", b & 0xff));
+            }
+            return sb.toString();
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+            log("MD5 Hashing Error:" + e.getMessage());
+            return null;
+        }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

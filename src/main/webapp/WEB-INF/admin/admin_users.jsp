@@ -48,7 +48,7 @@
         <main class="app-content">
             <div class="app-title">
                 <ul class="app-breadcrumb breadcrumb side">
-                    <li class="breadcrumb-item active"><a href="${pageContext.request.contextPath}/usermanagement"><b>Danh sách người dùng</b></a></li>
+                    <li class="breadcrumb-item active"><a href="usermanagement"><b>Danh sách người dùng</b></a></li>
                 </ul>
             </div>
             <div class="row">
@@ -76,7 +76,7 @@
                                 </div>
                             </div>
                             <h3 style="color: green; text-align: center; margin: 20px 0">${requestScope.mess}</h3>
-
+                            <h3 style="color: red; text-align: center; margin: 20px 0">${requestScope.error}</h3>
                             <c:choose>
                                 <c:when test="${not empty requestScope.LISTUSERS}">
                                     <c:set var="pageNum" value="${param.page ne null && param.page.matches('^[0-9]+$') ? param.page : '1'}" />
@@ -112,18 +112,18 @@
                                                     <td>
                                                         <c:set var="isActiveUser" value="${u.status}" />
                                                         <c:if test="${isActiveUser}">
-                                                            <a class="btn btn-primary btn-sm trash" href="usermanagement?action=Delete&uid=${u.id}&page=${currentPage}${requestScope.searchQuery != null ? '&search=' += requestScope.searchQuery : ''}" onclick="return confirm('Bạn có chắc muốn xóa?')">
+                                                            <a class="btn btn-primary btn-sm trash" href="usermanagement?action=Delete&uid=${u.id}&page=${currentPage}${requestScope.searchQuery != null ? '&search=' + requestScope.searchQuery : ''}" onclick="return confirm('Bạn có chắc muốn xóa?')">
                                                                 <i class="fas fa-trash-alt"></i>
                                                             </a>
-                                                            <a class="btn btn-primary btn-sm edit" href="usermanagement?action=Edit&username=${u.userName}&page=${currentPage}">
+                                                            <a class="btn btn-primary btn-sm edit" href="usermanagement?action=Edit&username=${u.userName}&page=${currentPage}${requestScope.searchQuery != null ? '&search=' + requestScope.searchQuery : ''}">
                                                                 <i class="fas fa-edit"></i>
                                                             </a>
                                                         </c:if>
                                                         <c:if test="${!isActiveUser}">
-                                                            <a class="btn btn-success btn-sm restore" href="usermanagement?action=Restore&uid=${u.id}&page=${currentPage}${requestScope.searchQuery != null ? '&search=' += requestScope.searchQuery : ''}" onclick="return confirm('Bạn có chắc muốn khôi phục?')">
+                                                            <a class="btn btn-success btn-sm restore" href="usermanagement?action=Restore&uid=${u.id}&page=${currentPage}${requestScope.searchQuery != null ? '&search=' + requestScope.searchQuery : ''}" onclick="return confirm('Bạn có chắc muốn khôi phục?')">
                                                                 <i class="fas fa-undo"></i>
                                                             </a>
-                                                            <a class="btn btn-danger btn-sm delete" href="usermanagement?action=PermanentlyDelete&uid=${u.id}&page=${currentPage}${requestScope.searchQuery != null ? '&search=' += requestScope.searchQuery : ''}" onclick="return confirm('Bạn có chắc muốn xóa vĩnh viễn?')">
+                                                            <a class="btn btn-danger btn-sm delete" href="usermanagement?action=PermanentlyDelete&uid=${u.id}&page=${currentPage}${requestScope.searchQuery != null ? '&search=' + requestScope.searchQuery : ''}" onclick="return confirm('Bạn có chắc muốn xóa vĩnh viễn người dùng này?')">
                                                                 <i class="fas fa-trash"></i>
                                                             </a>
                                                         </c:if>
@@ -135,12 +135,12 @@
 
                                     <div class="pagination">
                                         <c:if test="${totalPages > 1}">
-                                            <a href="usermanagement?page=1${requestScope.searchQuery != null ? '&action=Search&search=' += requestScope.searchQuery : ''}">Đầu</a>
+                                            <a href="usermanagement?page=1${requestScope.searchQuery != null ? '&action=Search&search=' + requestScope.searchQuery : ''}">Đầu</a>
                                             <c:forEach begin="1" end="${totalPages}" var="i">
-                                                <a href="usermanagement?page=${i}${requestScope.searchQuery != null ? '&action=Search&search=' += requestScope.searchQuery : ''}"
+                                                <a href="usermanagement?page=${i}${requestScope.searchQuery != null ? '&action=Search&search=' + requestScope.searchQuery : ''}"
                                                    class="${i == currentPage ? 'active' : ''}">${i}</a>
                                             </c:forEach>
-                                            <a href="usermanagement?page=${totalPages}${requestScope.searchQuery != null ? '&action=Search&search=' += requestScope.searchQuery : ''}">Cuối</a>
+                                            <a href="usermanagement?page=${totalPages}${requestScope.searchQuery != null ? '&action=Search&search=' + requestScope.searchQuery : ''}">Cuối</a>
                                         </c:if>
                                     </div>
                                 </c:when>

@@ -67,37 +67,50 @@ public class CartServlet extends HttpServlet {
                             }
                             CartItem item = new CartItem(product, Integer.parseInt(quantity));
 
-                            // Existing cart is already loaded, just add the item
-                            if (carts == null || carts.isEmpty()) {
-                                listItem = cartService.createCart(item);
-                            } else {
-                                listItem = cartService.addItemToCart(item);
-                            }
+                            try {
+                                // Existing cart is already loaded, just add the item
+                                if (carts == null || carts.isEmpty()) {
+                                    listItem = cartService.createCart(item);
+                                } else {
+                                    listItem = cartService.addItemToCart(item);
+                                }
 
-                            // Update session with cart data immediately
-                            if (listItem != null) {
-                                carts = new ArrayList<>(listItem.values());
-                                session.setAttribute("CART", carts);
-                            }
+                                // Update session with cart data immediately
+                                if (listItem != null) {
+                                    carts = new ArrayList<>(listItem.values());
+                                    session.setAttribute("CART", carts);
+                                }
 
-                            // Save cart to cookie immediately after adding
-                            String strCarts = cartService.convertCartToString(carts);
-                            Object accountObj = session.getAttribute("account");
-                            if (accountObj != null) {
-                                model.UserDTO user = (model.UserDTO) accountObj;
-                                String cartCookieName = "Cart_" + user.getId();
-                                String cookieValue = strCarts.replace(",", "-");
-                                cartService.saveCartToCookie(request, response, cookieValue, cartCookieName);
-                            }
+                                // Save cart to cookie immediately after adding
+                                String strCarts = cartService.convertCartToString(carts);
+                                Object accountObj = session.getAttribute("account");
+                                if (accountObj != null) {
+                                    model.UserDTO user = (model.UserDTO) accountObj;
+                                    String cartCookieName = "Cart_" + user.getId();
+                                    String cookieValue = strCarts.replace(",", "-");
+                                    cartService.saveCartToCookie(request, response, cookieValue, cartCookieName);
+                                }
 
-                            // Redirect back to the referring page instead of cart page
-                            String referer = request.getHeader("Referer");
-                            if (referer != null && !referer.isEmpty()) {
-                                response.sendRedirect(referer);
-                            } else {
-                                response.sendRedirect("shop"); // Fallback to shop page
+                                // Redirect back to the referring page instead of cart page
+                                String referer = request.getHeader("Referer");
+                                if (referer != null && !referer.isEmpty()) {
+                                    response.sendRedirect(referer);
+                                } else {
+                                    response.sendRedirect("shop"); // Fallback to shop page
+                                }
+                                shouldForward = false; // Không forward vì đã redirect
+                                
+                            } catch (RuntimeException e) {
+                                // Nếu có lỗi về tồn kho, hiển thị thông báo và redirect
+                                session.setAttribute("CART_ERROR", e.getMessage());
+                                String referer = request.getHeader("Referer");
+                                if (referer != null && !referer.isEmpty()) {
+                                    response.sendRedirect(referer);
+                                } else {
+                                    response.sendRedirect("shop");
+                                }
+                                shouldForward = false;
                             }
-                            shouldForward = false; // Không forward vì đã redirect
                             return;
 
                         } else if ("Delete".equals(action)) {

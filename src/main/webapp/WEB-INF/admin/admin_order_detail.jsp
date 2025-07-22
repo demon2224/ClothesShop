@@ -48,7 +48,7 @@
                                             <td>${d.product.size[0]}</td>
                                             <td>${d.product.colors[0]}</td>
                                             <td>${d.quantity}</td>
-                                            <td>${d.price}</td>
+                                            <td>${d.getFormattedPrice()}đ</td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>

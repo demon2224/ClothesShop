@@ -8,7 +8,7 @@
         <title>Clothes - Shop</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" href="assets\home\img\faviconn.png">
+        <link rel="shortcut icon" type="image/x-icon" href="assets/home/img/faviconn.png">
 
         <!-- all css here -->
         <%@include file="/WEB-INF/include/add_css.jsp"%>
@@ -31,10 +31,10 @@
                                 <!--sidebar banner-->
                                 <div class="sidebar_widget banner mb-35">
                                     <div class="banner_img mb-35">
-                                        <a href="#"><img src="assets\home\img\banner\banner5.jpg" alt=""></a>
+                                        <a href="#"><img src="assets/home/img/banner/banner5.jpg" alt=""></a>
                                     </div>
                                     <div class="banner_img">
-                                        <a href="#"><img src="assets\home\img\banner\banner6.jpg" alt=""></a>
+                                        <a href="#"><img src="assets/home/img/banner/banner6.jpg" alt=""></a>
                                     </div>
                                 </div>
                                 <!--sidebar banner end-->
@@ -55,7 +55,7 @@
                                                     </div>
                                                     <div class="cart_info">
                                                         <a href="singleproduct?product_id=${p.id}">${p.name}</a>
-                                                        <span class="cart_price">$${p.salePrice}</span>
+                                                        <span class="cart_price">${p.getFormattedSalePrice()}&#273;</span>
                                                     </div>
                                                 </div>
                                             </c:if>
@@ -70,7 +70,7 @@
                                 <!--sidebar banner-->
                                 <div class="sidebar_widget bottom ">
                                     <div class="banner_img">
-                                        <a href="#"><img src="assets\home\img\banner\banner9.jpg" alt=""></a>
+                                        <a href="#"><img src="assets/home/img/banner/banner9.jpg" alt=""></a>
                                     </div>
                                 </div>
                                 <!--sidebar banner end-->
@@ -132,9 +132,9 @@
                                                         <div class="product_content">
                                                             <div style="display: flex; justify-content: center">
                                                                 <c:if test="${p.price != p.salePrice}">
-                                                                    <span style="margin-right: 10px; font-weight: 400;" class="old_price" id="oldprice">${p.price}&#273;</span>
+                                                                    <span style="margin-right: 10px; font-weight: 400;" class="old_price" id="oldprice">${p.getFormattedPrice()}&#273;</span>
                                                                 </c:if>
-                                                                <span class="current_price">${p.salePrice}đ</span>
+                                                                <span class="current_price">${p.getFormattedSalePrice()}đ</span>
                                                             </div>
                                                             <h3 class="product_title"><a href="singleproduct?product_id=${p.id}">${p.name}</a></h3>
                                                         </div>
@@ -174,7 +174,7 @@
                                                     <div class="product_thumb">
                                                         <a href="singleproduct?product_id=${p.id}"><img src="${p.images[0]}" alt=""></a>
                                                         <div class="hot_img">
-                                                            <img src="assets\home\img\cart\span-hot.png" alt="">
+                                                            <img src="assets/home/img/cart/span-hot.png" alt="">
                                                         </div>
                                                         <div class="product_action">
                                                             <!-- Chỉ cho phép User và Admin thêm vào giỏ hàng -->
@@ -199,9 +199,9 @@
                                                     <div class="product_content">
                                                         <div style="display: flex; justify-content: center">
                                                             <c:if test="${p.price != p.salePrice}">
-                                                                <span style="margin-right: 10px; font-weight: 400;" class="old_price" id="oldprice">Rs. ${p.price}&#273;</span>
+                                                                <span style="margin-right: 10px; font-weight: 400;" class="old_price" id="oldprice">${p.getFormattedPrice()}&#273;</span>
                                                             </c:if>
-                                                            <span class="current_price">${p.salePrice}&#273;
+                                                            <span class="current_price">${p.getFormattedSalePrice()}&#273;
                                                             </span>
                                                         </div>
                                                         <h3 class="product_title"><a href="singleproduct?product_id=${p.id}">${p.name}</a></h3>
@@ -234,7 +234,7 @@
                                     <div class="row">
                                         <div class="col-lg-6 col-md-6">
                                             <div class="single_banner">
-                                                <a href="filter?discount=dis40"><img src="assets\home\img\banner\banner7.jpg" alt=""></a>
+                                                <a href="filter?discount=dis40"><img src="assets/home/img/banner/banner7.jpg" alt=""></a>
                                                 <div class="banner_title">
                                                     <p>Up to <span> 40%</span> off</p>
                                                 </div>

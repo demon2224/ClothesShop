@@ -2,6 +2,7 @@
 package model;
 
 import java.sql.Date;
+import utils.PriceFormatter;
 
 /**
  *
@@ -171,5 +172,19 @@ public class ProductDTO {
         } else {
             return price;
         }
+    }
+    
+    // Format giá theo kiểu Việt Nam với dấu phẩy phân tách hàng nghìn
+    public String getFormattedPrice() {
+        return PriceFormatter.format(price);
+    }
+    
+    public String getFormattedSalePrice() {
+        return PriceFormatter.format(getSalePrice());
+    }
+    
+    // Static method để format bất kỳ số tiền nào
+    public static String formatPrice(double amount) {
+        return PriceFormatter.format(amount);
     }
 }

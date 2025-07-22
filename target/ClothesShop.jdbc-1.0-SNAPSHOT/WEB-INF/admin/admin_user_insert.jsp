@@ -27,7 +27,7 @@
                         <div class="tile-body">
                             <h3 style="color: green; text-align: center; margin: 20px 0">${requestScope.mess}</h3>
                             <h3 style="color: red; text-align: center; margin: 20px 0">${requestScope.error}</h3>
-                            <form class="row" action="usermanagement" method="post">
+                            <form class="row" action="usermanagement" method="post" enctype="multipart/form-data">
                                 <input type="hidden" name="action" value="InsertUser">
 
                                 <div class="form-group col-md-3">
@@ -36,8 +36,13 @@
                                 </div>
 
                                 <div class="form-group col-md-3">
-                                    <label class="control-label">Tên đầy đủ</label>
-                                    <input class="form-control" required name="fullname" type="text" value="${requestScope.fullname}">
+                                    <label class="control-label">Tên</label>
+                                    <input class="form-control" required name="firstname" type="text" value="${requestScope.firstname}">
+                                </div>
+
+                                <div class="form-group col-md-3">
+                                    <label class="control-label">Họ</label>
+                                    <input class="form-control" required name="lastname" type="text" value="${requestScope.lastname}">
                                 </div>
 
                                 <div class="form-group col-md-3">
@@ -47,7 +52,7 @@
 
                                 <div class="form-group col-md-3">
                                     <label class="control-label">Mật khẩu</label>
-                                    <input class="form-control" required name="password" type="text" value="${requestScope.password}">
+                                    <input class="form-control" required name="password" type="password" value="${requestScope.password}">
                                 </div>
 
                                 <div class="form-group col-md-3">
@@ -75,7 +80,7 @@
 
                                 <div class="form-group col-md-12">
                                     <button class="btn btn-save" type="submit">Lưu lại</button>
-                                    <a class="btn btn-cancel" href="${pageContext.request.contextPath}/usermanagement">Hủy bỏ</a>
+                                    <a class="btn btn-cancel" href="usermanagement">Hủy bỏ</a>
                                 </div>
                             </form>
                         </div>
